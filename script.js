@@ -843,7 +843,11 @@ window.renderRapport = function() {
 };
 
 window.printRapport = function() {
-  window.print();
+  document.body.classList.add('print-rapport');
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => document.body.classList.remove('print-rapport'), 500);
+  }, 100);
 };
 
 // ─── MODALS ────────────────────────────────────────────
