@@ -1,4 +1,3 @@
-
 :root {
   --green: #1D9E75; --green-dark: #0F6E56; --green-light: #E1F5EE; --green-text: #085041;
   --bg: #f2f2ee; --surface: #ffffff; --surface2: #f8f8f4;
@@ -183,6 +182,43 @@ body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); col
 .inv-footer { font-size: 11px; color: #bbb; text-align: center; border-top: 1px solid #eee; padding-top: 12px; line-height: 1.7; }
 .inv-stamp { display: inline-block; border: 2.5px solid var(--green); color: var(--green); font-size: 14px; font-weight: 700; padding: 6px 20px; border-radius: 6px; letter-spacing: 0.1em; transform: rotate(-7deg); }
 
+/* ════════════════════════════════════════════════
+   ZONE SIGNATURE — FACTURES ET RAPPORTS
+════════════════════════════════════════════════ */
+.inv-sign-zone {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin: 28px 0 20px;
+  padding: 20px 0 0;
+  border-top: 1px solid #eee;
+}
+.inv-sign-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.inv-sign-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+.inv-sign-line {
+  height: 1px;
+  background: #333;
+  width: 100%;
+  margin: 40px 0 8px;
+}
+.inv-sign-name {
+  font-size: 10px;
+  color: #999;
+  font-style: italic;
+  text-align: center;
+}
+
 /* ── ACTIVITY ── */
 .act-item { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--bg); }
 .act-item:last-child { border-bottom: none; }
@@ -199,21 +235,20 @@ body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); col
 .bien-loc { font-size: 11px; color: var(--text3); }
 .bien-prix { font-size: 13px; font-weight: 600; white-space: nowrap; }
 
-@media print {
-  .app { display: none; }
-  .modal-bg { position: static; background: none; padding: 0; }
-  .inv-preview { box-shadow: none; max-height: none; }
-  .no-print { display: none !important; }
-}
-.brand-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:48px;}
-  .brand-logo img{height:38px;width:auto;filter:brightness(0) invert(1) opacity(.9);}
-/* ── JOURNAL QUOTIDIEN ────────────────────────────────── */
+/* ── PDF DOWNLOAD BTN ── */
+.btn-pdf { background:linear-gradient(135deg,#1D9E75,#15805f); color:#fff; border:none; }
+.btn-pdf:hover { background:linear-gradient(135deg,#15805f,#0f6347); }
+.pdf-loading { opacity:.6; pointer-events:none; }
+
+/* ════════════════════════════════════════════════
+   JOURNAL QUOTIDIEN
+════════════════════════════════════════════════ */
 .journal-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
 .journal-grid .metric { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 20px; }
 .journal-entry-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
 .journal-entry-row:last-child { border-bottom:none; }
 .journal-entry-cat { font-size:11px; padding:2px 8px; border-radius:99px; font-weight:600; white-space:nowrap; }
-.journal-entry-desc { flex:1; font-size:13px; color:var(--text1); font-weight:500; }
+.journal-entry-desc { flex:1; font-size:13px; color:var(--text); font-weight:500; }
 .journal-entry-note { font-size:11px; color:var(--text3); }
 .journal-entry-amount { font-size:13px; font-weight:700; white-space:nowrap; font-family:'DM Mono',monospace; }
 .journal-entry-amount.recette { color:var(--green); }
@@ -245,7 +280,103 @@ body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); col
 .journal-date-header { display:flex; align-items:center; gap:8px; margin:10px 0 6px; }
 .journal-date-label { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; }
 .journal-date-line { flex:1; height:1px; background:var(--border); }
-/* ── PDF DOWNLOAD BTN ─────────────────────────────────── */
-.btn-pdf { background:linear-gradient(135deg,#1D9E75,#15805f); color:#fff; border:none; }
-.btn-pdf:hover { background:linear-gradient(135deg,#15805f,#0f6347); }
-.pdf-loading { opacity:.6; pointer-events:none; }
+
+/* ── SOLDE GLOBAL CUMULÉ ── */
+.journal-global-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+.journal-global-box {
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
+.journal-global-box.highlight {
+  background: var(--surface);
+  border: 2px solid var(--border2);
+}
+.journal-global-box.highlight.pos {
+  border-color: rgba(29,158,117,.4);
+  background: rgba(29,158,117,.04);
+}
+.journal-global-box.highlight.neg {
+  border-color: rgba(226,75,74,.35);
+  background: rgba(226,75,74,.04);
+}
+.journal-global-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.journal-global-val {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ════════════════════════════════════════════════
+   RAPPORT FINANCIER
+════════════════════════════════════════════════ */
+#rapport-print-zone {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: 30px 32px;
+}
+.rap-print-header {
+  text-align: center;
+  padding-bottom: 22px;
+  border-bottom: 2px solid var(--green);
+  margin-bottom: 24px;
+}
+.rap-print-header .inv-logo {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+.brand-logo { display:flex; align-items:center; gap:10px; text-decoration:none; margin-bottom:48px; }
+.brand-logo img { height:38px; width:auto; filter:brightness(0) invert(1) opacity(.9); }
+
+/* ════════════════════════════════════════════════
+   IMPRESSION — FACTURES
+════════════════════════════════════════════════ */
+@media print {
+  /* Par défaut : on imprime la facture (modal) */
+  body:not(.print-rapport) .app { display: none !important; }
+  body:not(.print-rapport) .modal-bg { position: static !important; background: none !important; padding: 0 !important; }
+  body:not(.print-rapport) .inv-preview { box-shadow: none !important; max-height: none !important; border-radius: 0 !important; }
+  body:not(.print-rapport) .no-print { display: none !important; }
+
+  /* Quand on imprime le rapport */
+  body.print-rapport .app { display: flex !important; height: auto !important; overflow: visible !important; }
+  body.print-rapport .sidebar { display: none !important; }
+  body.print-rapport .main { display: block !important; overflow: visible !important; }
+  body.print-rapport .topbar { display: none !important; }
+  body.print-rapport .content { overflow: visible !important; padding: 0 !important; }
+  body.print-rapport .page { display: none !important; }
+  body.print-rapport #page-rapport { display: block !important; }
+  body.print-rapport .no-print { display: none !important; }
+  body.print-rapport #rapport-print-zone {
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 20px 24px !important;
+    box-shadow: none !important;
+  }
+  body.print-rapport .card {
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+  body.print-rapport .metric {
+    break-inside: avoid;
+  }
+  /* Signature sur facture à l'impression */
+  .inv-sign-zone {
+    margin-top: 32px;
+    page-break-inside: avoid;
+  }
+}

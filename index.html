@@ -56,6 +56,10 @@
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><rect x="2" y="1" width="12" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h4"/></svg>
         Journal quotidien
       </div>
+      <div class="nav-item" onclick="nav('rapport',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><path d="M2 14V2h12v12H2z"/><path d="M5 11V7M8 11V5M11 11V9"/></svg>
+        Rapport financier
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="db-status">
@@ -317,6 +321,25 @@
           <div class="metric"><div class="metric-lbl">Dépenses ce mois</div><div class="metric-val" id="j-dep-month" style="color:var(--red)">—</div><div class="metric-note">FCFA</div></div>
         </div>
 
+        <!-- Solde global cumulé -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title">💼 Solde global (toutes périodes)</div></div>
+          <div class="journal-global-row">
+            <div class="journal-global-box">
+              <div class="journal-global-lbl">Total recettes</div>
+              <div class="journal-global-val" style="color:var(--green)" id="j-global-rec">—</div>
+            </div>
+            <div class="journal-global-box">
+              <div class="journal-global-lbl">Total dépensé</div>
+              <div class="journal-global-val" style="color:var(--red)" id="j-global-dep">—</div>
+            </div>
+            <div class="journal-global-box highlight" id="j-global-net-box">
+              <div class="journal-global-lbl">Solde net restant</div>
+              <div class="journal-global-val" id="j-global-net">—</div>
+            </div>
+          </div>
+        </div>
+
         <div class="grid2" style="align-items:start">
           <!-- FORMULAIRE AJOUT -->
           <div class="card">
@@ -398,6 +421,83 @@
       </div>
       <!-- ══════════════════════════════════════════════ -->
 
+      <!-- ══════════════════════════════════════════════ -->
+      <!-- RAPPORT FINANCIER                              -->
+      <!-- ══════════════════════════════════════════════ -->
+      <div class="page" id="page-rapport">
+        <div class="card no-print" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title">📊 Rapport financier — Période</div></div>
+          <div class="frow3" style="margin-bottom:0">
+            <div class="fg"><label class="flabel">Du</label><input class="finput" type="date" id="rap-du" oninput="renderRapport()"></div>
+            <div class="fg"><label class="flabel">Au</label><input class="finput" type="date" id="rap-au" oninput="renderRapport()"></div>
+            <div class="fg"><label class="flabel">Raccourci</label>
+              <select class="fselect" id="rap-preset" onchange="rapPreset(this.value)">
+                <option value="">— Personnalisé —</option>
+                <option value="today">Aujourd'hui</option>
+                <option value="week">7 derniers jours</option>
+                <option value="month" selected>Ce mois-ci</option>
+                <option value="lastmonth">Mois dernier</option>
+                <option value="year">Cette année</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+            <button class="btn btn-primary btn-sm" onclick="printRapport()">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M4 6V2h8v4M4 11h8v4H4v-4zM2 6h12v6h-3M2 6v0h0"/></svg>
+              🖨 Imprimer le rapport
+            </button>
+          </div>
+        </div>
+
+        <!-- Zone imprimable -->
+        <div id="rapport-print-zone">
+          <div class="rap-print-header">
+            <div class="inv-logo" style="color:#1D9E75">PRIMO SOLUTION</div>
+            <div style="font-size:11px;color:#999">Foncier-Immobilier-Services · Secteur 05, Ouagadougou, Burkina Faso</div>
+            <div style="font-size:14px;font-weight:700;margin-top:14px">RAPPORT FINANCIER</div>
+            <div id="rap-periode-label" style="font-size:12px;color:#888;margin-top:2px"></div>
+          </div>
+
+          <div class="grid3" style="margin:18px 0">
+            <div class="metric"><div class="metric-lbl">Total recettes</div><div class="metric-val" style="color:var(--green)" id="rap-rec">—</div><div class="metric-note">FCFA (journal + factures payées)</div></div>
+            <div class="metric"><div class="metric-lbl">Total dépenses</div><div class="metric-val" style="color:var(--red)" id="rap-dep">—</div><div class="metric-note">FCFA</div></div>
+            <div class="metric"><div class="metric-lbl">Solde net</div><div class="metric-val" id="rap-net">—</div><div class="metric-note">FCFA</div></div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><div class="card-title">Répartition par catégorie</div></div>
+            <div id="rap-categories"></div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><div class="card-title">Factures émises sur la période</div></div>
+            <div id="rap-factures"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Détail journal (recettes / dépenses)</div></div>
+            <div id="rap-journal"></div>
+          </div>
+
+          <!-- Signature rapport -->
+          <div class="inv-sign-zone">
+            <div class="inv-sign-box">
+              <div class="inv-sign-lbl">Établi par</div>
+              <div class="inv-sign-line"></div>
+              <div class="inv-sign-name">PRIMO SOLUTION SARL</div>
+            </div>
+            <div class="inv-sign-box">
+              <div class="inv-sign-lbl">Visa / Approbation</div>
+              <div class="inv-sign-line"></div>
+              <div class="inv-sign-name">Date : ____ / ____ / ______</div>
+            </div>
+          </div>
+
+          <div class="inv-footer" style="margin-top:18px">Rapport généré le <span id="rap-gen-date"></span> · PRIMO SOLUTION SARL</div>
+        </div>
+      </div>
+      <!-- ══════════════════════════════════════════════ -->
+
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app -->
@@ -444,6 +544,21 @@
       </div>
     </div>
     <div id="inv-stamp-wrap" style="text-align:center;margin-bottom:16px;display:none"><span class="inv-stamp">PAYÉE ✓</span></div>
+
+    <!-- ZONE SIGNATURE -->
+    <div class="inv-sign-zone">
+      <div class="inv-sign-box">
+        <div class="inv-sign-lbl">Le Client</div>
+        <div class="inv-sign-line"></div>
+        <div class="inv-sign-name">Signature précédée de la mention "Bon pour accord"</div>
+      </div>
+      <div class="inv-sign-box">
+        <div class="inv-sign-lbl">Pour PRIMO SOLUTION</div>
+        <div class="inv-sign-line"></div>
+        <div class="inv-sign-name">Signature &amp; cachet</div>
+      </div>
+    </div>
+
     <div class="inv-footer">PRIMO SOLUTION SARL ·<br>Orange Money : +226 57 97 94 48 · Moov Money : +226 71 19 68 77<br>Paiement à 15 jours. Merci de votre confiance.</div>
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px" class="no-print">
       <button class="btn" onclick="document.getElementById('inv-bg').style.display='none'">Fermer</button>
@@ -550,7 +665,7 @@ window.nav = function(page, el) {
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pg = document.getElementById('page-'+page);
   if(pg) pg.classList.add('active');
-  const titles = { dashboard:'Tableau de bord', biens:'Biens immobiliers', clients:'Clients — CRM', paiements:'Paiements & Loyers', factures:'Facturation', 'nouvelle-facture':'Nouvelle facture', journal:'Journal quotidien' };
+  const titles = { dashboard:'Tableau de bord', biens:'Biens immobiliers', clients:'Clients — CRM', paiements:'Paiements & Loyers', factures:'Facturation', 'nouvelle-facture':'Nouvelle facture', journal:'Journal quotidien', rapport:'Rapport financier' };
   document.getElementById('page-title').textContent = titles[page]||page;
   if(el) el.classList.add('active');
   else {
@@ -565,12 +680,14 @@ window.nav = function(page, el) {
   if(page==='factures') renderFactures();
   if(page==='nouvelle-facture') initNF();
   if(page==='journal') initJournal();
+  if(page==='rapport') initRapport();
 };
 window.topbarAction = () => {
-  const actions = { dashboard:'nouvelle-facture', biens:'bien', clients:'client', paiements:'paiement', factures:'nouvelle-facture', 'nouvelle-facture':'nouvelle-facture', journal:'journal-entry' };
+  const actions = { dashboard:'nouvelle-facture', biens:'bien', clients:'client', paiements:'paiement', factures:'nouvelle-facture', 'nouvelle-facture':'nouvelle-facture', journal:'journal-entry', rapport:'rapport-noop' };
   const a = actions[state.currentPage]||'nouvelle-facture';
   if(a==='nouvelle-facture') nav('nouvelle-facture',null);
   else if(a==='journal-entry') document.getElementById('j-desc')?.focus();
+  else if(a==='rapport-noop') printRapport();
   else openModal(a);
 };
 
@@ -1007,6 +1124,7 @@ function initJournal() {
   renderJournalMetrics();
   renderJournalSolde();
   renderJournalTable();
+  renderJournalGlobal();
 }
 
 function renderJournalMetrics() {
@@ -1029,6 +1147,21 @@ function renderJournalMetrics() {
   document.getElementById('j-dep-today').textContent = fmt(depToday);
   document.getElementById('j-rec-month').textContent = fmtM(recMonth);
   document.getElementById('j-dep-month').textContent = fmtM(depMonth);
+}
+
+// ─── SOLDE GLOBAL CUMULÉ (toutes périodes) ────────────
+function renderJournalGlobal() {
+  const totalRec = state.journal.filter(e=>e.type==='recette').reduce((s,e)=>s+(e.montant||0),0);
+  const totalDep = state.journal.filter(e=>e.type==='depense').reduce((s,e)=>s+(e.montant||0),0);
+  const net = totalRec - totalDep;
+  document.getElementById('j-global-rec').textContent = fmt(totalRec)+' F';
+  document.getElementById('j-global-dep').textContent = fmt(totalDep)+' F';
+  const netEl = document.getElementById('j-global-net');
+  netEl.textContent = (net>=0?'+':'')+fmt(net)+' F';
+  netEl.style.color = net>=0 ? 'var(--green)' : 'var(--red)';
+  const box = document.getElementById('j-global-net-box');
+  box.classList.toggle('pos', net>=0);
+  box.classList.toggle('neg', net<0);
 }
 
 window.renderJournalSolde = function() {
@@ -1161,6 +1294,7 @@ window.saveJournal = async function() {
     renderJournalMetrics();
     renderJournalSolde();
     renderJournalTable();
+    renderJournalGlobal();
   } catch(e){ showToast('Erreur Firebase : '+e.message,'error'); }
 };
 
@@ -1173,7 +1307,129 @@ window.deleteJournal = async function(id) {
     renderJournalMetrics();
     renderJournalSolde();
     renderJournalTable();
+    renderJournalGlobal();
   } catch(e){ showToast('Erreur : '+e.message,'error'); }
+};
+
+// ══════════════════════════════════════════════════════
+// ─── RAPPORT FINANCIER ────────────────────────────────
+// ══════════════════════════════════════════════════════
+
+function initRapport() {
+  document.getElementById('rap-preset').value = 'month';
+  rapPreset('month');
+}
+
+window.rapPreset = function(val) {
+  const now = new Date();
+  let du, au;
+  if(val==='today'){ du = au = today(); }
+  else if(val==='week'){ const d=new Date(now); d.setDate(d.getDate()-6); du = d.toISOString().split('T')[0]; au = today(); }
+  else if(val==='month'){ du = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`; au = today(); }
+  else if(val==='lastmonth'){
+    const d = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const dEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+    du = d.toISOString().split('T')[0]; au = dEnd.toISOString().split('T')[0];
+  }
+  else if(val==='year'){ du = `${now.getFullYear()}-01-01`; au = today(); }
+  else return renderRapport();
+  document.getElementById('rap-du').value = du;
+  document.getElementById('rap-au').value = au;
+  renderRapport();
+};
+
+window.renderRapport = function() {
+  const du = document.getElementById('rap-du').value;
+  const au = document.getElementById('rap-au').value;
+  if(!du || !au) return;
+
+  const dateInRange = (dateStr) => dateStr >= du && dateStr <= au;
+
+  // Journal sur la période
+  const journalPeriode = state.journal.filter(e=>dateInRange(e.dateStr));
+  const jRec = journalPeriode.filter(e=>e.type==='recette').reduce((s,e)=>s+(e.montant||0),0);
+  const jDep = journalPeriode.filter(e=>e.type==='depense').reduce((s,e)=>s+(e.montant||0),0);
+
+  // Factures sur la période (par date de création)
+  const facturesPeriode = state.factures.filter(f=>{
+    if(!f.createdAt) return false;
+    const d = f.createdAt.toDate ? f.createdAt.toDate() : new Date(f.createdAt);
+    const ds = d.toISOString().split('T')[0];
+    return dateInRange(ds);
+  });
+  const facturesPayeesTTC = facturesPeriode.filter(f=>f.statut==='payee').reduce((s,f)=>s+(f.ttc||0),0);
+
+  const totalRec = jRec + facturesPayeesTTC;
+  const totalDep = jDep;
+  const net = totalRec - totalDep;
+
+  document.getElementById('rap-rec').textContent = fmt(totalRec)+' F';
+  document.getElementById('rap-dep').textContent = fmt(totalDep)+' F';
+  const netEl = document.getElementById('rap-net');
+  netEl.textContent = (net>=0?'+':'')+fmt(net)+' F';
+  netEl.style.color = net>=0 ? 'var(--green)' : 'var(--red)';
+
+  document.getElementById('rap-periode-label').textContent =
+    `Période du ${new Date(du+'T00:00:00').toLocaleDateString('fr-FR')} au ${new Date(au+'T00:00:00').toLocaleDateString('fr-FR')}`;
+  document.getElementById('rap-gen-date').textContent = new Date().toLocaleDateString('fr-FR')+' à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  // Répartition par catégorie
+  const catTotals = {};
+  journalPeriode.forEach(e=>{
+    const cat = getCatInfo(e.type, e.cat);
+    const key = e.type+':'+cat.label;
+    if(!catTotals[key]) catTotals[key] = { label:cat.label, type:e.type, css:cat.css, total:0 };
+    catTotals[key].total += (e.montant||0);
+  });
+  const catList = Object.values(catTotals).sort((a,b)=>b.total-a.total);
+  const catEl = document.getElementById('rap-categories');
+  if(!catList.length){ catEl.innerHTML = '<div class="empty-state" style="padding:20px"><p>Aucune donnée sur cette période</p></div>'; }
+  else catEl.innerHTML = `<table class="tbl"><thead><tr><th>Catégorie</th><th>Type</th><th>Montant</th></tr></thead><tbody>${
+    catList.map(c=>`<tr>
+      <td><span class="cat-badge ${c.css}">${c.label}</span></td>
+      <td>${c.type==='recette'?'Recette':'Dépense'}</td>
+      <td style="font-weight:600;color:${c.type==='recette'?'var(--green)':'var(--red)'}">${c.type==='recette'?'+':'-'}${fmt(c.total)} F</td>
+    </tr>`).join('')
+  }</tbody></table>`;
+
+  // Factures de la période
+  const facEl = document.getElementById('rap-factures');
+  if(!facturesPeriode.length){ facEl.innerHTML = '<div class="empty-state" style="padding:20px"><p>Aucune facture sur cette période</p></div>'; }
+  else facEl.innerHTML = `<table class="tbl"><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Service</th><th>TTC</th><th>Statut</th></tr></thead><tbody>${
+    facturesPeriode.map(f=>`<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">${f.numero||'—'}</td>
+      <td style="color:var(--text2)">${fmtDate(f.createdAt)}</td>
+      <td style="font-weight:500">${f.clientNom||'—'}</td>
+      <td><span class="badge ${TYPE_BADGES[f.type]||'b-gray'}">${TYPE_LABELS[f.type]||f.type}</span></td>
+      <td style="font-weight:600">${fmt(f.ttc||0)} F</td>
+      <td><span class="badge ${STATUT_BADGES[f.statut]||'b-gray'}">${STATUT_LABELS[f.statut]||f.statut}</span></td>
+    </tr>`).join('')
+  }</tbody></table>`;
+
+  // Détail journal
+  const jEl = document.getElementById('rap-journal');
+  const sortedJournal = [...journalPeriode].sort((a,b)=>b.dateStr.localeCompare(a.dateStr));
+  if(!sortedJournal.length){ jEl.innerHTML = '<div class="empty-state" style="padding:20px"><p>Aucune entrée de journal sur cette période</p></div>'; }
+  else jEl.innerHTML = `<table class="tbl"><thead><tr><th>Date</th><th>Catégorie</th><th>Description</th><th>Mode</th><th>Montant</th></tr></thead><tbody>${
+    sortedJournal.map(e=>{
+      const cat = getCatInfo(e.type, e.cat);
+      return `<tr>
+        <td style="color:var(--text2);white-space:nowrap">${new Date(e.dateStr+'T00:00:00').toLocaleDateString('fr-FR')}</td>
+        <td><span class="cat-badge ${cat.css}">${cat.label}</span></td>
+        <td>${e.desc||'—'}</td>
+        <td style="font-size:12px;color:var(--text2)">${e.mode||'—'}</td>
+        <td style="font-weight:600;color:${e.type==='recette'?'var(--green)':'var(--red)'}">${e.type==='recette'?'+':'-'}${fmt(e.montant||0)} F</td>
+      </tr>`;
+    }).join('')
+  }</tbody></table>`;
+};
+
+window.printRapport = function() {
+  document.body.classList.add('print-rapport');
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => document.body.classList.remove('print-rapport'), 500);
+  }, 100);
 };
 
 // ─── MODALS ────────────────────────────────────────────
