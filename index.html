@@ -459,7 +459,7 @@
           </div>
 
           <div class="grid3" style="margin:18px 0">
-            <div class="metric"><div class="metric-lbl">Total recettes</div><div class="metric-val" style="color:var(--green)" id="rap-rec">—</div><div class="metric-note">FCFA (journal + factures payées)</div></div>
+            <div class="metric"><div class="metric-lbl">Total recettes</div><div class="metric-val" style="color:var(--green)" id="rap-rec">—</div><div class="metric-note">FCFA (journal quotidien)</div></div>
             <div class="metric"><div class="metric-lbl">Total dépenses</div><div class="metric-val" style="color:var(--red)" id="rap-dep">—</div><div class="metric-note">FCFA</div></div>
             <div class="metric"><div class="metric-lbl">Solde net</div><div class="metric-val" id="rap-net">—</div><div class="metric-note">FCFA</div></div>
           </div>
@@ -1345,10 +1345,10 @@ window.renderRapport = function() {
 
   const dateInRange = (dateStr) => dateStr >= du && dateStr <= au;
 
-  // Journal sur la période
+  // Journal uniquement sur la période
   const journalPeriode = state.journal.filter(e=>dateInRange(e.dateStr));
-  const jRec = journalPeriode.filter(e=>e.type==='recette').reduce((s,e)=>s+(e.montant||0),0);
-  const jDep = journalPeriode.filter(e=>e.type==='depense').reduce((s,e)=>s+(e.montant||0),0);
+  const totalRec = journalPeriode.filter(e=>e.type==='recette').reduce((s,e)=>s+(e.montant||0),0);
+  const totalDep = journalPeriode.filter(e=>e.type==='depense').reduce((s,e)=>s+(e.montant||0),0);
 
   // Factures sur la période (par date de création)
   const facturesPeriode = state.factures.filter(f=>{
@@ -1357,10 +1357,10 @@ window.renderRapport = function() {
     const ds = d.toISOString().split('T')[0];
     return dateInRange(ds);
   });
-  const facturesPayeesTTC = facturesPeriode.filter(f=>f.statut==='payee').reduce((s,f)=>s+(f.ttc||0),0);
 
-  const totalRec = jRec + facturesPayeesTTC;
-  const totalDep = jDep;
+
+
+
   const net = totalRec - totalDep;
 
   document.getElementById('rap-rec').textContent = fmt(totalRec)+' F';
